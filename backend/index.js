@@ -2,24 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mysql = require('mysql2');
+const db=require('./model/db')
 
 const app = express();
 const PORT = 5000;
 
-// Database connection
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '@Root123',
-    database: 'picture',
-});
 
-db.connect(err => {
-    if (err) throw err;
-    console.log('Connected to MySQL Database');
-});
-
-// Middleware
 app.use(cors({
     origin:'http://localhost:5173',
     methods:['POST','GET','DELETE','PUT']
@@ -35,10 +23,9 @@ app.get('/api/areas', (req, res) => {
     });
 });
 
-// Routes
+
 app.post('/api/areas', (req, res) => {
     const areas = req.body;
-    // Process and save to database
     for (const area of areas) {
         const areaName = Object.keys(area)[0];
         const coordinates = area[areaName];
@@ -52,7 +39,7 @@ app.post('/api/areas', (req, res) => {
 
 app.delete('/api/areas/:id', (req, res) => {
     const { id } = req.params;
-    const query = 'DELETE FROM areas WHERE id = ?'; // Make sure your areas table has an `id` field
+    const query = 'DELETE FROM areas WHERE id = ?'; 
     db.query(query, [id], (err) => {
         if (err) throw err;
         res.status(200).send('Area deleted!');
@@ -69,7 +56,7 @@ app.post('/api/areas/:id', (req, res) => {
     });
 });
 
-// Start server
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

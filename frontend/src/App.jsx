@@ -31,7 +31,6 @@ const App = () => {
     axios
       .get("http://localhost:5000/api/areas")
       .then(function (response) {
-        // handle success
         console.log(response.data);
         const areaCoordinates = {
           x: response.data[0][0],
@@ -43,12 +42,9 @@ const App = () => {
         setRectangles([...rectangles]);
       })
       .catch(function (error) {
-        // handle error
         console.log(error);
       })
-      .finally(function () {
-        // always executed
-      });
+      
   };
 
   const drawExistingRectangles = (ctx) => {
