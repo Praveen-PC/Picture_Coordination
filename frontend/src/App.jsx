@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
-
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const App = () => {
@@ -9,11 +8,12 @@ const App = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState(null);
   const [selectedRectIndex, setSelectedRectIndex] = useState(null);
-  const imgSrc = "/forest.jpg"; // Image source
+  const imgSrc = "/forest.jpg"; 
 
   useEffect(() => {
+    getAreas();
     drawCanvas();
-  }, [rectangles]); // Redraw on rectangles change
+  }, [rectangles]); 
 
   const drawCanvas = () => {
     const canvas = canvasRef.current;
@@ -25,6 +25,30 @@ const App = () => {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       drawExistingRectangles(ctx);
     };
+  };
+
+  const getAreas = () => {
+    axios
+      .get("http://localhost:5000/api/areas")
+      .then(function (response) {
+        // handle success
+        console.log(response.data);
+        const areaCoordinates = {
+          x: response.data[0][0],
+          y: response.data[0][1],
+          width: response.data[1][0],
+          height: response.data[1][1],
+        };
+        drawCanvasWithCurrentRect(newRectangle);
+        setRectangles([...rectangles]);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+      .finally(function () {
+        // always executed
+      });
   };
 
   const drawExistingRectangles = (ctx) => {
@@ -138,7 +162,7 @@ const App = () => {
     }));
 
     try {
-      await axios.post("http://localhost:5000/api/areas", formattedShapes);
+      await axios.post(`http://localhost:5000/api/areas`, formattedShapes);
       alert("Data sent to backend!");
     } catch (error) {
       console.error(error);
@@ -149,15 +173,14 @@ const App = () => {
   return (
     <>
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
+        <div class="container-fluid fw-bold">
           <a class="navbar-brand" href="#">
-            Navbar
+            Image Marking
           </a>
         </div>
       </nav>
 
       <div className="container mt-5">
-
         <div className="row">
           <div className="col">
             <canvas
@@ -183,7 +206,7 @@ const App = () => {
             {selectedRectIndex !== null && (
               <div className="card p-3">
                 <h2 className="text-center">Edit Rectangle</h2>
-                <hr/>
+                <hr />
                 <div className="mb-3">
                   <label for="exampleInputEmail1" class="form-label">
                     X-Coordinates :
@@ -205,60 +228,65 @@ const App = () => {
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="" className="form-label">Y-Coordinates :</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  value={rectangles[selectedRectIndex].y}
-                  onChange={(e) =>
-                    handleUpdate(
-                      rectangles[selectedRectIndex].x,
-                      Number(e.target.value),
-                      rectangles[selectedRectIndex].width,
-                      rectangles[selectedRectIndex].height
-                    )
-                  }
-                  placeholder="Y Coordinate"
-                />
+                  <label htmlFor="" className="form-label">
+                    Y-Coordinates :
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={rectangles[selectedRectIndex].y}
+                    onChange={(e) =>
+                      handleUpdate(
+                        rectangles[selectedRectIndex].x,
+                        Number(e.target.value),
+                        rectangles[selectedRectIndex].width,
+                        rectangles[selectedRectIndex].height
+                      )
+                    }
+                    placeholder="Y Coordinate"
+                  />
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="" className="form-label">Width :</label>
-                <input
-                  type="number"
-                  className="form-control "
-                  value={rectangles[selectedRectIndex].width}
-                  onChange={(e) =>
-                    handleUpdate(
-                      rectangles[selectedRectIndex].x,
-                      rectangles[selectedRectIndex].y,
-                      Number(e.target.value),
-                      rectangles[selectedRectIndex].height
-                    )
-                  }
-                  placeholder="Width"
-                />
+                  <label htmlFor="" className="form-label">
+                    Width :
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control "
+                    value={rectangles[selectedRectIndex].width}
+                    onChange={(e) =>
+                      handleUpdate(
+                        rectangles[selectedRectIndex].x,
+                        rectangles[selectedRectIndex].y,
+                        Number(e.target.value),
+                        rectangles[selectedRectIndex].height
+                      )
+                    }
+                    placeholder="Width"
+                  />
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="" className="form-label">Height</label>
-                <input
-                  type="number"
-                  className="form-control mt-2 "
-                  value={rectangles[selectedRectIndex].height}
-                  onChange={(e) =>
-                    handleUpdate(
-                      rectangles[selectedRectIndex].x,
-                      rectangles[selectedRectIndex].y,
-                      rectangles[selectedRectIndex].width,
-                      Number(e.target.value)
-                    )
-                  }
-                  placeholder="Height"
-                />
-              </div>  
+                  <label htmlFor="" className="form-label">
+                    Height :
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control mt-2 "
+                    value={rectangles[selectedRectIndex].height}
+                    onChange={(e) =>
+                      handleUpdate(
+                        rectangles[selectedRectIndex].x,
+                        rectangles[selectedRectIndex].y,
+                        rectangles[selectedRectIndex].width,
+                        Number(e.target.value)
+                      )
+                    }
+                    placeholder="Height"
+                  />
+                </div>
               </div>
-
             )}
           </div>
         </div>

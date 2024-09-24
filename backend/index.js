@@ -26,6 +26,14 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
+ 
+app.get('/api/areas', (req, res) => {
+    const query = 'SELECT * FROM areas';
+    db.query(query, (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    });
+});
 
 // Routes
 app.post('/api/areas', (req, res) => {
@@ -51,7 +59,7 @@ app.delete('/api/areas/:id', (req, res) => {
     });
 });
 
-app.put('/api/areas/:id', (req, res) => {
+app.post('/api/areas/:id', (req, res) => {
     const { id } = req.params;
     const { coordinates } = req.body;
     const query = 'UPDATE areas SET coordinates = ? WHERE id = ?';
